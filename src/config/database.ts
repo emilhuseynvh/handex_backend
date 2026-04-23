@@ -21,6 +21,7 @@ export default new DataSource({
     password: config.password,
     database: config.database,
     logging: true,
+    synchronize: true,
     entities: [join(__dirname, '../entities/*.entity.{ts,js}')],
     migrations: [join(__dirname, '../migrations/*.{ts,js}')],
 });
