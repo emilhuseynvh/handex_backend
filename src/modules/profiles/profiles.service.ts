@@ -5,6 +5,7 @@ import { Repository } from "typeorm";
 import { CreateProfilesDto } from "./dto/create-profiles.dto";
 import { I18nService } from "nestjs-i18n";
 import { UpdateProfilesDto } from "./dto/update-profiles.dto";
+import { UpdateProfileOrderDto } from "./dto/update-profile-order.dto";
 import { TranslationsEntity } from "src/entities/translations.entity";
 import { ClsService } from "nestjs-cls";
 import { Lang } from "src/shares/enums/lang.enum";
@@ -129,5 +130,16 @@ export class ProfilesService {
             message: "Profile deleted succesfully"
         };
 
+    }
+
+    async updateOrder(params: UpdateProfileOrderDto) {
+        for (const item of params.items) {
+            const result = await this.profilesRepo.update(item.id, { order: item.order });
+            if (result.affected === 0) {
+                throw new NotFoundException(`Profile is not found in ${item.id} id`);
+            }
+        }
+
+        return { message: 'Orders updated successfully' };
     }
 }

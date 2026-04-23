@@ -12,6 +12,8 @@ import { MetaService } from "../meta/meta.service";
 import { UploadEntity } from "src/entities/upload.entity";
 import { UpdateNewsDto } from "./dto/update-news.dto";
 import { TranslationsEntity } from "src/entities/translations.entity";
+import { SitemapService } from "../sitemap/sitemap.service";
+import { SitemapPage } from "src/shares/enums/sitemap-page.enum";
 
 @Injectable()
 export class NewsService {
@@ -33,7 +35,8 @@ export class NewsService {
         private translationsRepo: Repository<TranslationsEntity>,
 
         private uploadService: UploadService,
-        private i18n: I18nService
+        private i18n: I18nService,
+        private sitemapService: SitemapService,
     ) { }
 
     async list(query: string, page: number = 0) {
@@ -196,6 +199,8 @@ export class NewsService {
 
         await this.newsRepo.save(news);
 
+        await this.sitemapService.touch(SitemapPage.NEWS);
+
         return news;
     }
 
@@ -353,6 +358,8 @@ export class NewsService {
 
         await this.newsRepo.save(news);
 
+        await this.sitemapService.touch(SitemapPage.NEWS);
+
         return news;
     }
 
@@ -360,6 +367,8 @@ export class NewsService {
         let result = await this.newsRepo.delete(id);
 
         if (!result.affected) throw new NotFoundException(this.i18n.t('error.errors.not_found'));
+
+        await this.sitemapService.touch(SitemapPage.NEWS);
 
         return {
             message: this.i18n.t('response.deleted')
@@ -371,6 +380,8 @@ export class NewsService {
 
         if(!result.affected) throw new NotFoundException(`Item not found in ${id} id`);
 
+        await this.sitemapService.touch(SitemapPage.NEWS);
+
         return {
             message: 'Pinned succesfully'
         }
@@ -380,6 +391,8 @@ export class NewsService {
         const result = await this.newsRepo.update(id, { order: 1 });
 
         if (!result.affected) throw new NotFoundException(`Item not found in ${id} id`);
+
+        await this.sitemapService.touch(SitemapPage.NEWS);
 
         return {
             message: 'Unpinned succesfully'

@@ -9,6 +9,17 @@ import { TranslationsEntity } from "src/entities/translations.entity";
 import { mapTranslation } from "src/shares/utils/translation.util";
 import { UpdateContentDto } from "./content-dto/update-content.dto";
 import { UploadEntity } from "src/entities/upload.entity";
+import { SitemapService } from "../sitemap/sitemap.service";
+import { SitemapPage } from "src/shares/enums/sitemap-page.enum";
+
+const CONTENT_SLUG_TO_PAGE: Record<string, SitemapPage> = {
+    graduates: SitemapPage.HOME,
+    hero: SitemapPage.HOME,
+    'about-features': SitemapPage.ABOUT,
+    corporate: SitemapPage.CORPORATE,
+    'corporate-informations': SitemapPage.CORPORATE,
+    partners: SitemapPage.CORPORATE,
+};
 
 @Injectable()
 export class ContentService {
@@ -23,8 +34,15 @@ export class ContentService {
         private uploadRepo: Repository<UploadEntity>,
 
         private cls: ClsService,
-        private i18n: I18nService
+        private i18n: I18nService,
+        private sitemapService: SitemapService,
     ) { }
+
+    private async touchBySlug(slug?: string) {
+        if (!slug) return;
+        const page = CONTENT_SLUG_TO_PAGE[slug];
+        if (page) await this.sitemapService.touch(page);
+    }
 
     async get(slug: string, query: string) {
         let lang = this.cls.get('lang');
@@ -87,7 +105,11 @@ export class ContentService {
         }
 
         content.translations = translations;
-        return await this.contentRepo.save(content);
+        const saved = await this.contentRepo.save(content);
+
+        await this.touchBySlug(params.slug);
+
+        return saved;
     }
 
     async update(id: number, params: UpdateContentDto) {
@@ -163,12 +185,18 @@ export class ContentService {
         }
 
         let result = await this.contentRepo.save(existingContent);
+
+        await this.touchBySlug(existingContent.slug);
+
         return result;
     }
 
     async delete(id: number) {
+        const content = await this.contentRepo.findOne({ where: { id } });
         let result = await this.contentRepo.delete(id);
         if (!result.affected) throw new NotFoundException(this.i18n.t('error.errors.not_found'));
+
+        await this.touchBySlug(content?.slug);
 
         return {
             message: this.i18n.t('response.deleted')

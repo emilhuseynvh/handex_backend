@@ -9,6 +9,8 @@ import { TranslationsEntity } from "src/entities/translations.entity";
 import { ClsService } from "nestjs-cls";
 import { mapTranslation } from "src/shares/utils/translation.util";
 import { UpdateCustomersDto } from "./dto/update-customers.dto";
+import { SitemapService } from "../sitemap/sitemap.service";
+import { SitemapPage } from "src/shares/enums/sitemap-page.enum";
 
 @Injectable()
 export class CustomerService {
@@ -23,8 +25,13 @@ export class CustomerService {
         private translationsRepo: Repository<TranslationsEntity>,
 
         private i18n: I18nService,
-        private cls: ClsService
+        private cls: ClsService,
+        private sitemapService: SitemapService,
     ) { }
+
+    private async touchCorporateIfMatches(slug?: string) {
+        if (slug === 'corporate') await this.sitemapService.touch(SitemapPage.CORPORATE);
+    }
 
     async list(slug: string) {
         let lang = this.cls.get('lang');
@@ -76,7 +83,11 @@ export class CustomerService {
             translations: translationsEntities
         });
 
-        return await customer.save();
+        const saved = await customer.save();
+
+        await this.touchCorporateIfMatches(params.slug);
+
+        return saved;
     }
 
     async update(id: number, params: UpdateCustomersDto) {
@@ -131,13 +142,20 @@ export class CustomerService {
             ), ...translationsEntities];
         }
 
-        return await customer.save();
+        const saved = await customer.save();
+
+        await this.touchCorporateIfMatches(customer.slug);
+
+        return saved;
     }
 
     async delete(id: number) {
+        const customer = await this.customersRepo.findOne({ where: { id } });
         let result = await this.customersRepo.delete(id);
 
         if (!result.affected) throw new NotFoundException(this.i18n.t('error.errors.not_found'));
+
+        await this.touchCorporateIfMatches(customer?.slug);
     }
 
 }

@@ -255,14 +255,15 @@ export class StudyAreaService {
     async getProfile(slug: string, model: string) {
         const lang = this.cls.get('lang')
         const result = await this.profileRepo.find({
-            where: { 
+            where: {
                 studyArea: { slug, model },
                 translations: { lang }
              },
              select: {
                 id: true,
                 name: true,
-		speciality: true,
+                order: true,
+                speciality: true,
                 image: {
                     id: true,
                     url: true,
@@ -273,6 +274,7 @@ export class StudyAreaService {
                     value: true
                 },
              },
+             order: { order: 'ASC', id: 'ASC' },
              relations: ['image', 'translations']
         })
         return result.map(mapTranslation)

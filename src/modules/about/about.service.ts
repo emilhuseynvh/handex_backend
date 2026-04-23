@@ -14,6 +14,8 @@ import { SectionService } from "../section/section.service";
 import { UpdateAboutPageDto } from "./dto/update-about.dto";
 import { UploadEntity } from "src/entities/upload.entity";
 import { mapTranslation } from "src/shares/utils/translation.util";
+import { SitemapService } from "../sitemap/sitemap.service";
+import { SitemapPage } from "src/shares/enums/sitemap-page.enum";
 
 @Injectable()
 export class AboutService {
@@ -35,7 +37,9 @@ export class AboutService {
 
         private sectionService: SectionService,
 
-        private cls: ClsService
+        private cls: ClsService,
+
+        private sitemapService: SitemapService,
     ) { }
 
 
@@ -106,6 +110,8 @@ export class AboutService {
 
         await this.aboutRepo.save(about);
 
+        await this.sitemapService.touch(SitemapPage.ABOUT);
+
         return about;
     }
 
@@ -120,6 +126,7 @@ export class AboutService {
             });
             about[0].images = images;
             await this.aboutRepo.save(about[0]);
+            await this.sitemapService.touch(SitemapPage.ABOUT);
             return {
                 message: "About updated succesfully"
             };
@@ -130,6 +137,8 @@ export class AboutService {
         let result = await this.aboutRepo.delete(id);
 
         if (!result.affected) throw new NotFoundException('About is not found');
+
+        await this.sitemapService.touch(SitemapPage.ABOUT);
 
         return {
             message: "About deleted succesfully"

@@ -32,6 +32,7 @@ import { RedirectModule } from './modules/redirect/redirect.module';
 import { GroupModule } from './modules/group/group.module';
 import { StatisticModule } from './modules/statistic/statistic.module';
 import { BrochureModule } from './modules/brochure/brochure.module';
+import { SitemapModule } from './modules/sitemap/sitemap.module';
 
 @Module({
   imports: [
@@ -89,7 +90,8 @@ import { BrochureModule } from './modules/brochure/brochure.module';
     ContactModule,
     RedirectModule,
     StatisticModule,
-    BrochureModule
+    BrochureModule,
+    SitemapModule
   ],
   controllers: [],
   providers: [AppService],

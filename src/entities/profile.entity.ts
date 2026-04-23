@@ -17,6 +17,9 @@ export class ProfilesEntity extends BaseEntity {
     @Column()
     model: string;
 
+    @Column({ default: 1 })
+    order: number;
+
     @OneToMany(() => TranslationsEntity, translation => translation.profile, { eager: true, cascade: true, nullable: true })
     translations: TranslationsEntity[];
 

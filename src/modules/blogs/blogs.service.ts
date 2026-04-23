@@ -12,6 +12,8 @@ import { BlogsEntity } from "src/entities/blogs.entity";
 import { CreateBlogsDto } from "./dto/create-blogs.dto";
 import { UpdateBlogsDto } from "./dto/update-blogs.dto";
 import { TranslationsEntity } from "src/entities/translations.entity";
+import { SitemapService } from "../sitemap/sitemap.service";
+import { SitemapPage } from "src/shares/enums/sitemap-page.enum";
 
 @Injectable()
 export class BlogsService {
@@ -33,7 +35,8 @@ export class BlogsService {
         private uploadRepo: Repository<UploadEntity>,
 
         private uploadService: UploadService,
-        private i18n: I18nService
+        private i18n: I18nService,
+        private sitemapService: SitemapService,
     ) { }
 
     async list(query: string, page: number = 0) {
@@ -228,6 +231,8 @@ export class BlogsService {
 
         await this.blogRepo.save(blogs);
 
+        await this.sitemapService.touch(SitemapPage.BLOG);
+
         return blogs;
     }
 
@@ -385,6 +390,8 @@ export class BlogsService {
 
         await this.blogRepo.save(blogs);
 
+        await this.sitemapService.touch(SitemapPage.BLOG);
+
         return blogs;
     }
 
@@ -393,15 +400,19 @@ export class BlogsService {
 
         if (!result.affected) throw new NotFoundException(this.i18n.t('error.errors.not_found'));
 
+        await this.sitemapService.touch(SitemapPage.BLOG);
+
         return {
             message: this.i18n.t('response.deleted')
         };
     }
-   
+
     async setPinnded(id: number) {
         const result = await this.blogRepo.update(id, { order: 2 });
 
         if (!result.affected) throw new NotFoundException(`Item not found in ${id} id`);
+
+        await this.sitemapService.touch(SitemapPage.BLOG);
 
         return {
             message: 'Pinned succesfully'
@@ -412,6 +423,8 @@ export class BlogsService {
         const result = await this.blogRepo.update(id, { order: 1 });
 
         if (!result.affected) throw new NotFoundException(`Item not found in ${id} id`);
+
+        await this.sitemapService.touch(SitemapPage.BLOG);
 
         return {
             message: 'Unpinned succesfully'

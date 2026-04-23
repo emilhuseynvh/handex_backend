@@ -7,6 +7,8 @@ import { CreateSectionDto } from "../about/dto/create-about.dto";
 import { SideEnum } from "src/shares/enums/side.enum";
 import { AboutEntity } from "src/entities/about.entity";
 import { UpdateSectionDto } from "./dto/update-section.dto";
+import { SitemapService } from "../sitemap/sitemap.service";
+import { SitemapPage } from "src/shares/enums/sitemap-page.enum";
 
 @Injectable()
 export class SectionService {
@@ -19,6 +21,8 @@ export class SectionService {
 
         @InjectRepository(AboutEntity)
         private aboutRepo: Repository<AboutEntity>,
+
+        private sitemapService: SitemapService,
     ) { }
 
     async list() {
@@ -80,6 +84,8 @@ export class SectionService {
         }
         await this.sectionRepo.save(sections);
 
+        await this.sitemapService.touch(SitemapPage.ABOUT);
+
         return sections;
     }
 
@@ -92,7 +98,11 @@ export class SectionService {
 
         if (params.right_side) await this.updateSide(section.right_side, params.right_side);
 
-        return this.sectionRepo.save(section);
+        const saved = await this.sectionRepo.save(section);
+
+        await this.sitemapService.touch(SitemapPage.ABOUT);
+
+        return saved;
     }
 
     private async updateSide(side: any, newSideData: any) {
@@ -127,6 +137,8 @@ export class SectionService {
         let result = await this.sectionRepo.delete(id);
 
         if (!result.affected) throw new NotFoundException('Section is not found');
+
+        await this.sitemapService.touch(SitemapPage.ABOUT);
 
         return {
             message: 'Section is deleted succesfully'

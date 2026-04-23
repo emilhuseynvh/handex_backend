@@ -4,6 +4,7 @@ import { ApiQuery } from "@nestjs/swagger";
 import { CreateProfilesDto } from "./dto/create-profiles.dto";
 import { Auth } from "src/shares/decorators/auth.decorator";
 import { UpdateProfilesDto } from "./dto/update-profiles.dto";
+import { UpdateProfileOrderDto } from "./dto/update-profile-order.dto";
 
 @Controller('profiles')
 export class ProfilesController {
@@ -21,6 +22,12 @@ export class ProfilesController {
     @Post()
     async create(@Body() body: CreateProfilesDto) {
         return await this.profilesService.create(body);
+    }
+
+    @Auth()
+    @Post('update/orders')
+    async updateOrder(@Body() body: UpdateProfileOrderDto) {
+        return await this.profilesService.updateOrder(body);
     }
 
     @Auth()

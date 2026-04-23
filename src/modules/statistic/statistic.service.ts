@@ -8,6 +8,8 @@ import { CreateStatisticDto } from "./dto/create-statistic.dto";
 import { TranslationsEntity } from "src/entities/translations.entity";
 import { mapTranslation } from "src/shares/utils/translation.util";
 import { UpdateStatisticDto } from "./dto/update-statistic.dto";
+import { SitemapService } from "../sitemap/sitemap.service";
+import { SitemapPage } from "src/shares/enums/sitemap-page.enum";
 
 @Injectable()
 export class StatisticService {
@@ -19,7 +21,12 @@ export class StatisticService {
         private translationRepo: Repository<TranslationsEntity>,
 
         private cls: ClsService,
+        private sitemapService: SitemapService,
     ) { }
+
+    private async touchCorporateIfMatches(field?: string) {
+        if (field === 'corporate') await this.sitemapService.touch(SitemapPage.CORPORATE);
+    }
 
     async list(field: string) {
         const lang = this.cls.get<Lang>('lang');
@@ -52,6 +59,8 @@ export class StatisticService {
 
         await result.save();
 
+        await this.touchCorporateIfMatches(params.field);
+
         return result;
     }
 
@@ -59,6 +68,8 @@ export class StatisticService {
         let statistic = await this.statisticRepo.findOne({ where: { id } });
 
         if (!statistic) throw new NotFoundException('Statistic is not found');
+
+        const previousField = statistic.field;
 
         if (params.count) statistic.count = params.count;
         if (params.field) statistic.field = params.field;
@@ -79,15 +90,24 @@ export class StatisticService {
 
                 await statistic.save();
 
+                await this.touchCorporateIfMatches(statistic.field);
+                if (previousField !== statistic.field) await this.touchCorporateIfMatches(previousField);
+
                 return statistic;
             }
         }
+
+        await this.touchCorporateIfMatches(statistic.field);
+        if (previousField !== statistic.field) await this.touchCorporateIfMatches(previousField);
     }
 
     async delete(id: number) {
+        const statistic = await this.statisticRepo.findOne({ where: { id } });
         let result = await this.statisticRepo.delete(id);
 
         if (!result.affected) throw new NotFoundException('Statistic is not found');
+
+        await this.touchCorporateIfMatches(statistic?.field);
 
         return {
             message: "Statistic deleted succesfully"

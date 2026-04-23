@@ -10,6 +10,8 @@ import { CreateFaqDto } from "./dto/create-faq.dto";
 import { TranslationsEntity } from "src/entities/translations.entity";
 import { UpdateFaqDto } from "./dto/update-faq.dto";
 import { StudyAreaEntity } from "src/entities/studyArea.entity";
+import { SitemapService } from "../sitemap/sitemap.service";
+import { SitemapPage } from "src/shares/enums/sitemap-page.enum";
 
 @Injectable()
 export class FaqService {
@@ -23,8 +25,13 @@ export class FaqService {
         @InjectRepository(TranslationsEntity)
         private translationsRepo: Repository<TranslationsEntity>,
 
-        private cls: ClsService
+        private cls: ClsService,
+        private sitemapService: SitemapService,
     ) { }
+
+    private async touchHomeIfMatches(model?: string) {
+        if (model === 'home') await this.sitemapService.touch(SitemapPage.HOME);
+    }
 
     async list(studyArea: number, model: string) {
         let lang = this.cls.get<Lang>('lang');
@@ -76,6 +83,8 @@ export class FaqService {
 
         await result.save();
 
+        await this.touchHomeIfMatches(params.model);
+
         return result;
     }
 
@@ -125,15 +134,20 @@ export class FaqService {
 
         await this.faqRepo.save(faq);
 
+        await this.touchHomeIfMatches(faq.model);
+
         return {
             message: 'FAQ updated successfully'
         };
     }
 
     async delete(id: number) {
+        const faq = await this.faqRepo.findOne({ where: { id } });
         let result = await this.faqRepo.delete(id);
 
         if (!result.affected) throw new NotFoundException('FAQ is not found');
+
+        await this.touchHomeIfMatches(faq?.model);
 
         return {
             message: 'FAQ deleted succesfully'

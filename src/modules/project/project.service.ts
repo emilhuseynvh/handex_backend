@@ -12,6 +12,8 @@ import { ProjectEntity } from "src/entities/project.entity";
 import { CreateProjectDto } from "./dto/create-project.dto";
 import { UpdateProjectDto } from "./dto/update-project.dto";
 import { TranslationsEntity } from "src/entities/translations.entity";
+import { SitemapService } from "../sitemap/sitemap.service";
+import { SitemapPage } from "src/shares/enums/sitemap-page.enum";
 
 @Injectable()
 export class ProjectService {
@@ -33,7 +35,8 @@ export class ProjectService {
         private uploadRepo: Repository<UploadEntity>,
 
         private uploadService: UploadService,
-        private i18n: I18nService
+        private i18n: I18nService,
+        private sitemapService: SitemapService,
     ) { }
 
     async list(page: number = 0) {
@@ -198,6 +201,8 @@ export class ProjectService {
 
         await this.projectRepo.save(project);
 
+        await this.sitemapService.touch(SitemapPage.PROJECTS);
+
         return project;
     }
 
@@ -355,6 +360,8 @@ export class ProjectService {
 
         await this.projectRepo.save(project);
 
+        await this.sitemapService.touch(SitemapPage.PROJECTS);
+
         return project;
     }
 
@@ -362,6 +369,8 @@ export class ProjectService {
         let result = await this.projectRepo.delete(id);
 
         if (!result.affected) throw new NotFoundException(this.i18n.t('error.errors.not_found'));
+
+        await this.sitemapService.touch(SitemapPage.PROJECTS);
 
         return {
             message: this.i18n.t('response.deleted')
@@ -373,15 +382,19 @@ export class ProjectService {
 
         if (!result.affected) throw new NotFoundException(`Item not found in ${id} id`);
 
+        await this.sitemapService.touch(SitemapPage.PROJECTS);
+
         return {
             message: 'Pinned succesfully'
         };
     }
-   
+
        async setUnpinned(id: number) {
         const result = await this.projectRepo.update(id, { order: 1 });
 
         if (!result.affected) throw new NotFoundException(`Item not found in ${id} id`);
+
+        await this.sitemapService.touch(SitemapPage.PROJECTS);
 
         return {
             message: 'Unpinned succesfully'

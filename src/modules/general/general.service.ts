@@ -6,6 +6,8 @@ import { DeepPartial, Repository } from "typeorm";
 import { CreateGeneralDto } from "./dto/create-general.dto";
 import { UploadEntity } from "src/entities/upload.entity";
 import { UpdateGeneralDto } from "./dto/update-general.dto";
+import { SitemapService } from "../sitemap/sitemap.service";
+import { SitemapPage } from "src/shares/enums/sitemap-page.enum";
 
 @Injectable()
 export class GeneralService {
@@ -13,7 +15,8 @@ export class GeneralService {
         @InjectRepository(GeneralEntity)
         private generalRepo: Repository<GeneralEntity>,
 
-        private i18n: I18nService
+        private i18n: I18nService,
+        private sitemapService: SitemapService,
     ) { }
 
     async list() {
@@ -45,7 +48,11 @@ export class GeneralService {
             ...params,
             company: params.company?.map(id => ({ id }) as DeepPartial<UploadEntity>)
         });
-        return await this.generalRepo.save(result);
+        const saved = await this.generalRepo.save(result);
+
+        await this.sitemapService.touch(SitemapPage.HOME);
+
+        return saved;
     }
 
     async update(params: UpdateGeneralDto) {
@@ -66,6 +73,8 @@ export class GeneralService {
         }
 
         const result = await this.generalRepo.save(entity);
+
+        await this.sitemapService.touch(SitemapPage.HOME);
 
         return {
             message: 'Uğurla yeniləndi',
