@@ -61,6 +61,8 @@ export class StudyAreaService {
                 id: true,
                 name: true,
                 slug: true,
+                createdAt: true,
+                updatedAt: true,
                 image: {
                     id: true,
                     url: true,
@@ -157,6 +159,8 @@ export class StudyAreaService {
                 hidden: true,
 		model: true,
                 name: true,
+                createdAt: true,
+                updatedAt: true,
                 translations: {
                     value: true,
                     field: true

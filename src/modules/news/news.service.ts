@@ -101,6 +101,7 @@ export class NewsService {
             select: {
                 id: true,
                 createdAt: true,
+                updatedAt: true,
                 slug: true,
                 translations: {
                     id: true,

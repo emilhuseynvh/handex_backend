@@ -85,6 +85,7 @@ export class BlogsService {
             id: true,
             slug: true,
             createdAt: true,
+            updatedAt: true,
             translations: {
                 id: true,
                 field: true,
@@ -137,6 +138,7 @@ export class BlogsService {
             select: {
                 id: true,
                 createdAt: true,
+                updatedAt: true,
                 slug: true,
                 translations: {
                     id: true,

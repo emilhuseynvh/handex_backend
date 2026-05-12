@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { UploadEntity } from "./upload.entity";
 import { TranslationsEntity } from "./translations.entity";
 import { MetaEntity } from "./meta.entity";
@@ -25,4 +25,7 @@ export class NewsEntity {
 
     @CreateDateColumn()
     createdAt: Date;
+
+    @UpdateDateColumn()
+    updatedAt: Date;
 }

@@ -1,4 +1,4 @@
-import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { UploadEntity } from "./upload.entity";
 import { TranslationsEntity } from "./translations.entity";
 import { ProgramEntity } from "./programs.entity";
@@ -64,4 +64,10 @@ export class StudyAreaEntity extends BaseEntity {
     @OneToOne(() => BrochureEntity, brochure => brochure.studyArea, { nullable: true })
     @JoinColumn()
     brochure: BrochureEntity;
+
+    @CreateDateColumn()
+    createdAt: Date;
+
+    @UpdateDateColumn()
+    updatedAt: Date;
 }
