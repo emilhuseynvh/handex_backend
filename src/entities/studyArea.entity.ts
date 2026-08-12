@@ -24,6 +24,9 @@ export class StudyAreaEntity extends BaseEntity {
     @Column({ nullable: true })
     hidden: string;
 
+    @Column({ nullable: true })
+    seoWord: string;
+
     @Column()
     color: string;
 

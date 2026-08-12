@@ -60,6 +60,12 @@ export class CreateStudyAreaDto {
     hidden: string;
 
     @Type()
+    @IsOptional()
+    @IsString()
+    @ApiProperty({ required: false, nullable: true, default: 'kursu' })
+    seoWord?: string;
+
+    @Type()
     @IsString()
     @ApiProperty({  default: 'home' })
     model: string;

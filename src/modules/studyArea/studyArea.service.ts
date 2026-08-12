@@ -61,6 +61,7 @@ export class StudyAreaService {
                 id: true,
                 name: true,
                 slug: true,
+                seoWord: true,
                 createdAt: true,
                 updatedAt: true,
                 image: {
@@ -157,6 +158,7 @@ export class StudyAreaService {
                 id: true,
                 slug: true,
                 hidden: true,
+                seoWord: true,
 		model: true,
                 name: true,
                 createdAt: true,
@@ -293,6 +295,7 @@ export class StudyAreaService {
             name: params.name,
             slug: params.slug,
             hidden: params.hidden,
+            seoWord: params.seoWord ?? null,
             model: params.model,
             color: params.color,
             image: params.image ? { id: params.image } : null,
@@ -403,6 +406,8 @@ export class StudyAreaService {
         if (params.color) studyArea.color = params.color;
 
         if(params.hidden) studyArea.hidden = params.hidden;
+
+        if (params.seoWord !== undefined) studyArea.seoWord = params.seoWord;
 
         if (params.name) studyArea.name = params.name;
 
