@@ -19,6 +19,7 @@ const CONTENT_SLUG_TO_PAGE: Record<string, SitemapPage> = {
     corporate: SitemapPage.CORPORATE,
     'corporate-informations': SitemapPage.CORPORATE,
     partners: SitemapPage.CORPORATE,
+    'reference-letters': SitemapPage.CORPORATE,
 };
 
 @Injectable()
