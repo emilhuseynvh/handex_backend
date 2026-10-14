@@ -20,6 +20,12 @@ export class ContactEntity extends BaseEntity {
     @Column()
     message: string;
 
+    @Column({ nullable: true })
+    company: string;
+
+    @Column({ default: 'individual' })
+    type: string;
+
     @CreateDateColumn()
     createdAt: Date;
 }

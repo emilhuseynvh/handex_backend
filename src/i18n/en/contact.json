@@ -18,5 +18,8 @@
   "message": {
     "isString": "Message must be a string.",
     "minLength": "Message cannot be empty."
+  },
+  "company": {
+    "isString": "Company name must be a string."
   }
 }

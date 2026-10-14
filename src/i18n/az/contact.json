@@ -18,5 +18,8 @@
   "message": {
     "isString": "Mesaj mətn formatında olmalıdır.",
     "minLength": "Mesaj boş ola bilməz."
+  },
+  "company": {
+    "isString": "Şirkət adı mətn formatında olmalıdır."
   }
 }

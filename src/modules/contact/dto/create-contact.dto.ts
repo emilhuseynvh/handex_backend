@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsEmail, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsIn, IsOptional, IsString, MinLength } from 'class-validator';
 
 export class CreateContactDto {
     @Type()
@@ -32,4 +32,16 @@ export class CreateContactDto {
     @MinLength(1, { message: 'contact.message.minLength' })
     @ApiProperty({ default: 'message' })
     message: string;
+
+    @Type()
+    @IsOptional()
+    @IsString({ message: 'contact.company.isString' })
+    @ApiProperty({ required: false, default: 'Handex MMC' })
+    company?: string;
+
+    @Type()
+    @IsOptional()
+    @IsIn(['individual', 'corporate'])
+    @ApiProperty({ required: false, default: 'individual', enum: ['individual', 'corporate'] })
+    type?: string;
 }
