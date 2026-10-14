@@ -8,6 +8,7 @@ import { CreateAboutDto } from "./content-dto/create-content.dto";
 import { TranslationsEntity } from "src/entities/translations.entity";
 import { mapTranslation } from "src/shares/utils/translation.util";
 import { UpdateContentDto } from "./content-dto/update-content.dto";
+import { UpdateContentOrderDto } from "./content-dto/update-content-order.dto";
 import { UploadEntity } from "src/entities/upload.entity";
 import { SitemapService } from "../sitemap/sitemap.service";
 import { SitemapPage } from "src/shares/enums/sitemap-page.enum";
@@ -57,6 +58,7 @@ export class ContentService {
             },
             select: {
                 id: true,
+                order: true,
                 images: {
                     id: true,
                     url: true,
@@ -68,14 +70,16 @@ export class ContentService {
                     field: true
                 }
             },
-            relations: ['translations', 'images']
+            relations: ['translations', 'images'],
+            order: { order: 'ASC', id: 'ASC' }
         })
 
         return result.map(item => mapTranslation(item));
     }
 
     async create(params: CreateAboutDto) {
-        let content = this.contentRepo.create({ slug: params.slug });
+        const last = await this.contentRepo.findOne({ where: { slug: params.slug }, order: { order: 'DESC' } });
+        let content = this.contentRepo.create({ slug: params.slug, order: (last?.order ?? 0) + 1 });
         content = await this.contentRepo.save(content);
 
         let translations: TranslationsEntity[] = [];
@@ -204,4 +208,19 @@ export class ContentService {
         };
     }
 
+    async updateOrder(params: UpdateContentOrderDto) {
+        let slug: string | undefined;
+
+        for (const item of params.items) {
+            const content = await this.contentRepo.findOneBy({ id: item.id });
+            if (!content) throw new NotFoundException(`Content is not found in ${item.id} id`);
+
+            await this.contentRepo.update(item.id, { order: item.order });
+            slug = content.slug;
+        }
+
+        await this.touchBySlug(slug);
+
+        return { message: 'Orders updated successfully' };
+    }
 }

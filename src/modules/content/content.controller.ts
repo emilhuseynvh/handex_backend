@@ -3,6 +3,7 @@ import { CreateAboutDto } from "./content-dto/create-content.dto";
 import { DeleteAboutDto } from "./content-dto/delete-content.dto";
 import { ApiBearerAuth, ApiParam, ApiQuery } from "@nestjs/swagger";
 import { UpdateContentDto } from "./content-dto/update-content.dto";
+import { UpdateContentOrderDto } from "./content-dto/update-content-order.dto";
 import { ContentService } from "./content.service";
 import { Auth } from "src/shares/decorators/auth.decorator";
 
@@ -28,6 +29,12 @@ export class ContentController {
         console.log(body.slug);
 
         return this.contentService.create(body);
+    }
+
+    @Auth()
+    @Post('update/orders')
+    async updateOrder(@Body() body: UpdateContentOrderDto) {
+        return await this.contentService.updateOrder(body);
     }
 
     @Auth()
