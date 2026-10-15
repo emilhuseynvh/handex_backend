@@ -9,7 +9,7 @@ import { MetaEntity } from "src/entities/meta.entity";
 import { MetaService } from "../meta/meta.service";
 import { UploadEntity } from "src/entities/upload.entity";
 import { BlogsEntity } from "src/entities/blogs.entity";
-import { CreateBlogsDto } from "./dto/create-blogs.dto";
+import { BLOG_CTA_FIELDS, CreateBlogsDto } from "./dto/create-blogs.dto";
 import { UpdateBlogsDto } from "./dto/update-blogs.dto";
 import { TranslationsEntity } from "src/entities/translations.entity";
 import { SitemapService } from "../sitemap/sitemap.service";
@@ -203,6 +203,11 @@ export class BlogsService {
                 field: 'description',
                 value: translation.description
             });
+
+            for (const field of BLOG_CTA_FIELDS) {
+                const value = translation[field]?.trim();
+                if (value) translations.push({ model: 'blogs', lang: translation.lang, field, value });
+            }
         }
 
         let metaArray = [];
@@ -298,6 +303,23 @@ export class BlogsService {
                         entityId: blogs.id
                     };
                     blogs.translations.push(newDescTranslation);
+                }
+
+                for (const field of BLOG_CTA_FIELDS) {
+                    if (translation[field] === undefined) continue;
+
+                    const value = translation[field].trim();
+                    const existing = blogs.translations.find(t => t.lang === lang && t.field === field);
+
+                    if (existing && value) {
+                        existing.value = value;
+                        await this.translationsRepo.save(existing);
+                    } else if (existing) {
+                        await this.translationsRepo.remove(existing);
+                        blogs.translations = blogs.translations.filter(t => t !== existing);
+                    } else if (value) {
+                        blogs.translations.push({ model: 'blogs', lang, field, value } as any);
+                    }
                 }
             }
         }
