@@ -9,6 +9,7 @@ import { GroupEntity } from "./group.entity";
 import { StatisticEntity } from "./statistic.entity";
 import { ProfilesEntity } from "./profile.entity";
 import { BrochureEntity } from "./brochure.entity";
+import { StudyAreaCategoryEntity } from "./studyAreaCategory.entity";
 
 @Entity('study_area')
 export class StudyAreaEntity extends BaseEntity {
@@ -54,6 +55,13 @@ export class StudyAreaEntity extends BaseEntity {
 
     @Column()
     model: string;
+
+    @Column({ type: 'int', nullable: true })
+    categoryId: number | null;
+
+    @ManyToOne(() => StudyAreaCategoryEntity, category => category.studyAreas, { nullable: true, onDelete: 'SET NULL' })
+    @JoinColumn({ name: 'categoryId' })
+    category: StudyAreaCategoryEntity;
 
     @OneToMany(() => ConsultationEntity, consultation => consultation.course, { cascade: true })
     consultation: ConsultationEntity[];

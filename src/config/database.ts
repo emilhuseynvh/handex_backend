@@ -21,7 +21,10 @@ export default new DataSource({
     password: config.password,
     database: config.database,
     logging: true,
-    synchronize: true,
+    // Schema changes go through migrations in src/migrations; they run automatically when the app starts.
+    synchronize: false,
+    migrationsRun: true,
     entities: [join(__dirname, '../entities/*.entity.{ts,js}')],
-    migrations: [join(__dirname, '../migrations/*.{ts,js}')],
+    // Build output also contains .d.ts files, so pick the extension matching how this file is being run.
+    migrations: [join(__dirname, `../migrations/*.${__filename.endsWith('.ts') ? 'ts' : 'js'}`)],
 });

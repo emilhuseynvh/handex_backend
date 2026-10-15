@@ -33,6 +33,7 @@ import { GroupModule } from './modules/group/group.module';
 import { StatisticModule } from './modules/statistic/statistic.module';
 import { BrochureModule } from './modules/brochure/brochure.module';
 import { SitemapModule } from './modules/sitemap/sitemap.module';
+import { StudyAreaCategoryModule } from './modules/studyAreaCategory/studyAreaCategory.module';
 
 @Module({
   imports: [
@@ -91,7 +92,8 @@ import { SitemapModule } from './modules/sitemap/sitemap.module';
     RedirectModule,
     StatisticModule,
     BrochureModule,
-    SitemapModule
+    SitemapModule,
+    StudyAreaCategoryModule
   ],
   controllers: [],
   providers: [AppService],
